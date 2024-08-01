@@ -4,8 +4,13 @@ import Tarea from "./components/Tarea";
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer, Zoom } from "react-toastify";
 
-
 const App = () => {
+  const tareasDeEjemplo = [
+    { id: 1, tarea: "Comprar pan", completed: false },
+    { id: 2, tarea: "Llamar al doctor", completed: true },
+    { id: 3, tarea: "Leer un libro", completed: false }
+  ];
+
   const [inputValue, setInputValue] = useState("");
   const [tareas, setTareas] = useState([]);
   const [isMounted, setIsMounted] = useState(false);
@@ -14,6 +19,8 @@ const App = () => {
     const data = window.localStorage.getItem("todoItems");
     if (data !== null) {
       setTareas(JSON.parse(data));
+    } else {
+      setTareas(tareasDeEjemplo);
     }
     setIsMounted(true);
   }, []);
@@ -25,11 +32,12 @@ const App = () => {
     }
   }, [tareas, isMounted]);
 
-  const toggleTarea = (id, completed) => {
+  const toggleTarea = (id) => {
     setTareas(tareas.map(tarea =>
-      tarea.id === id ? { ...tarea, completed: !completed } : tarea
+      tarea.id === id ? { ...tarea, completed: !tarea.completed } : tarea
     ));
   };
+
 
   const borrarTarea = (id) => {
     setTareas(tareas.filter(tarea => tarea.id !== id));
