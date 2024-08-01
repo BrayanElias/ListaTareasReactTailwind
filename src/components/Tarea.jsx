@@ -4,7 +4,7 @@ const Tarea = ({ tarea, borrarTarea, id, completed, toggleTarea }) => {
         <div className="my-4 max-w-96 border mx-auto">
             <div className="flex justify-between">
                 <input type="checkbox" name="" id="" checked={completed} onChange={() => toggleTarea(id)} />
-                <p className={completed ? "line-through" : ""}>{tarea}</p>
+                <p className={completed ? "line-through text-red-700" : ""}>{tarea}</p>
                 <span className="cursor-pointer" onClick={() => borrarTarea(id)}>🗑️</span>
             </div>
         </div>
