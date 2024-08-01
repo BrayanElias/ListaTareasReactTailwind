@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Navbar from "./components/Navbar"
 import Tarea from "./components/Tarea"
+import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer, Zoom } from "react-toastify";
 
 const App = () => {
   const [inputValue, setInputValue] = useState("")
@@ -29,7 +31,17 @@ const App = () => {
   function agregarTarea(e) {
     e.preventDefault()
     if (inputValue.trim() == "") {
-      alert("Necesitas escribir algo")
+      toast.error("Escribe una tarea", {
+        position: "top-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Zoom,
+      })
     } else {
       const nuevaTarea = {
         id: Date.now(),
@@ -57,6 +69,7 @@ const App = () => {
           }
         </div>
       </div>
+      <ToastContainer className=""/>
     </>
   )
 }
