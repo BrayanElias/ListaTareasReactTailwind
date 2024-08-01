@@ -3,34 +3,35 @@ import Navbar from "./components/Navbar";
 import Tarea from "./components/Tarea";
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer, Zoom } from "react-toastify";
-import { db } from "./firebase";
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+
 
 const App = () => {
   const [inputValue, setInputValue] = useState("");
   const [tareas, setTareas] = useState([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    const fetchTareas = async () => {
-      const tareasCollection = collection(db, "tareas");
-      const tareaSnapshot = await getDocs(tareasCollection);
-      const tareaList = tareaSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setTareas(tareaList);
-    };
+    const data = window.localStorage.getItem("todoItems");
+    if (data !== null) {
+      setTareas(JSON.parse(data));
+    }
+    setIsMounted(true);
+  }, []);
 
-    fetchTareas();
-  }, [tareas]);
+  useEffect(() => {
+    if (isMounted) {
+      const data = JSON.stringify(tareas);
+      window.localStorage.setItem("todoItems", data);
+    }
+  }, [tareas, isMounted]);
 
-  const toggleTarea = async (id, completed) => {
-    const tareaDoc = doc(db, "tareas", id);
-    await updateDoc(tareaDoc, { completed: !completed });
+  const toggleTarea = (id, completed) => {
     setTareas(tareas.map(tarea =>
       tarea.id === id ? { ...tarea, completed: !completed } : tarea
     ));
   };
 
-  const borrarTarea = async (id) => {
-    await deleteDoc(doc(db, "tareas", id));
+  const borrarTarea = (id) => {
     setTareas(tareas.filter(tarea => tarea.id !== id));
   };
 
@@ -38,7 +39,7 @@ const App = () => {
     setInputValue(e.target.value);
   };
 
-  const agregarTarea = async (e) => {
+  const agregarTarea = (e) => {
     e.preventDefault();
     if (inputValue.trim() === "") {
       toast.error("Escribe una tarea", {
@@ -54,11 +55,11 @@ const App = () => {
       });
     } else {
       const nuevaTarea = {
+        id: Date.now(),
         tarea: inputValue,
         completed: false
       };
-      const docRef = await addDoc(collection(db, "tareas"), nuevaTarea);
-      setTareas([...tareas, { id: docRef.id, ...nuevaTarea }]);
+      setTareas([...tareas, nuevaTarea]);
       setInputValue("");
     }
   };
