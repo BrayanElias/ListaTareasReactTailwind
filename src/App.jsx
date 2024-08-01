@@ -1,36 +1,46 @@
-import { useState } from "react";
-import Navbar from "./components/Navbar"
-import Tarea from "./components/Tarea"
+import { useState, useEffect } from "react";
+import Navbar from "./components/Navbar";
+import Tarea from "./components/Tarea";
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer, Zoom } from "react-toastify";
+import { db } from "./firebase";
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 
 const App = () => {
-  const [inputValue, setInputValue] = useState("")
-  const [agregarTareaClick, setAgregarTareaClick] = useState([])
+  const [inputValue, setInputValue] = useState("");
+  const [tareas, setTareas] = useState([]);
 
-  function toggleTarea(id) {
-    const tareasActualizadas = agregarTareaClick.map(tarea => {
-      if (tarea.id === id) {
-        return { ...tarea, completed: !tarea.completed };
-      }
-      return tarea;
-    });
-    setAgregarTareaClick(tareasActualizadas);
-  }
+  useEffect(() => {
+    const fetchTareas = async () => {
+      const tareasCollection = collection(db, "tareas");
+      const tareaSnapshot = await getDocs(tareasCollection);
+      const tareaList = tareaSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setTareas(tareaList);
+    };
 
+    fetchTareas();
+  }, [tareas]);
 
-  function borrarTarea(id) {
-    const tareasActualizadas = agregarTareaClick.filter((tarea) => tarea.id !== id);
-    setAgregarTareaClick(tareasActualizadas);
-  }
+  const toggleTarea = async (id, completed) => {
+    const tareaDoc = doc(db, "tareas", id);
+    await updateDoc(tareaDoc, { completed: !completed });
+    setTareas(tareas.map(tarea =>
+      tarea.id === id ? { ...tarea, completed: !completed } : tarea
+    ));
+  };
 
-  function inputEscribirTarea(e) {
+  const borrarTarea = async (id) => {
+    await deleteDoc(doc(db, "tareas", id));
+    setTareas(tareas.filter(tarea => tarea.id !== id));
+  };
+
+  const inputEscribirTarea = (e) => {
     setInputValue(e.target.value);
-  }
+  };
 
-  function agregarTarea(e) {
-    e.preventDefault()
-    if (inputValue.trim() == "") {
+  const agregarTarea = async (e) => {
+    e.preventDefault();
+    if (inputValue.trim() === "") {
       toast.error("Escribe una tarea", {
         position: "top-center",
         autoClose: 1000,
@@ -41,17 +51,17 @@ const App = () => {
         progress: undefined,
         theme: "colored",
         transition: Zoom,
-      })
+      });
     } else {
       const nuevaTarea = {
-        id: Date.now(),
         tarea: inputValue,
         completed: false
-      }
-      setAgregarTareaClick([...agregarTareaClick, nuevaTarea])
-      setInputValue("")
+      };
+      const docRef = await addDoc(collection(db, "tareas"), nuevaTarea);
+      setTareas([...tareas, { id: docRef.id, ...nuevaTarea }]);
+      setInputValue("");
     }
-  }
+  };
 
   return (
     <>
@@ -62,16 +72,16 @@ const App = () => {
         </div>
         <div className="mt-4">
           {
-            agregarTareaClick.map(tarea =>
+            tareas.map(tarea =>
               <Tarea key={tarea.id} id={tarea.id} tarea={tarea.tarea} completed={tarea.completed}
                 borrarTarea={borrarTarea} toggleTarea={toggleTarea} />
             )
           }
         </div>
       </div>
-      <ToastContainer className=""/>
+      <ToastContainer className="" />
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
