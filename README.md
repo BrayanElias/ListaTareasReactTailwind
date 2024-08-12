@@ -1,8 +1,5 @@
-# React + Vite
+# Lista de Tareas / TodoApp
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![iPhone-13-PRO-list-app-react-tailwind netlify app](https://github.com/user-attachments/assets/50e7d784-e971-4d90-b29e-93428a4cc9fc)
+![Macbook-Air-list-app-react-tailwind netlify app](https://github.com/user-attachments/assets/623ee60f-899f-435b-86e5-1db8e28dfc71)
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
